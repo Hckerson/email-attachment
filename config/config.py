@@ -7,6 +7,10 @@ from dataclasses import dataclass
 DEFAULT_CONFIG = {"download_folder": "downloads", "date_format": "%Y-%m-%d"}
 
 
+class AppconfigError(Exception):
+    pass
+
+
 @dataclass
 class Appconfig:
     file_dir = os.path.abspath(os.path.dirname(__file__))
@@ -26,8 +30,14 @@ class Appconfig:
         p.write_text(yaml.dump(DEFAULT_CONFIG))
         _data = DEFAULT_CONFIG
 
-    def configs(self):
-        return self._data
+    def configs(self, name: str):
+        return self._data[name]
+
+    def validate_configs(self):
+        if "download_folder" not in self._data:
+            raise AppconfigError("download_folder not found in config file")
+        if "date_format" not in self._data:
+            raise AppconfigError("date_format not found in config file")
 
 
 def prep_dir(cfg: Appconfig):
@@ -37,5 +47,6 @@ def prep_dir(cfg: Appconfig):
 
 def get_config():
     cfg = Appconfig()
+    cfg.validate_configs()
     prep_dir(cfg)
     return cfg

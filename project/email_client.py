@@ -15,11 +15,20 @@ class EmailClient:
     def __init__(self, host: str, port: int) -> None:
         self.host = host
         self.port = port
+        self.server: Optional[IMAP4_SSL] = None
 
     def initialize(self, user: str, password: str):
         try:
-            with IMAP4_SSL(host=self.host, port=self.port) as server:
-                server.login(user, password)
-                return server
+            self.server = IMAP4_SSL(self.host, self.port)
+            self.server.login(user, password)
         except Exception as e:
-            raise EmailClientError(message="Failed to initialize email client")
+            raise EmailClientError(message="Failed to initialize email client") from e
+
+    def download_attachments(self):
+        if self.server is None:
+            raise EmailClientError(message="Email client is not initialized")
+        try:
+            typ, msg, = self.server.search(None, "INBOX")
+            print(typ, msg)
+        except:
+            pass
