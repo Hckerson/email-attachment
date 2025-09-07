@@ -1,5 +1,6 @@
-from imaplib import IMAP4_SSL
 from typing import Optional
+from loguru import logger
+from imaplib import IMAP4_SSL
 
 
 class EmailClientError(Exception):
@@ -22,12 +23,14 @@ class EmailClient:
             self.server = IMAP4_SSL(self.host, self.port)
             self.server.login(user, password)
         except Exception as e:
+           
             raise EmailClientError(message="Failed to initialize email client") from e
 
     def download_attachments(self):
         if self.server is None:
             raise EmailClientError(message="Email client is not initialized")
         try:
+            logger.info("Downloading attachments")
             typ, msg, = self.server.search(None, "INBOX")
             print(typ, msg)
         except:

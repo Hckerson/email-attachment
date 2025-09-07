@@ -20,10 +20,10 @@ def main():
     email_client = EmailClient(IMAP_HOST, IMAP_PORT)
     email_client.initialize(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
     try:
-        email_client.download_attachments()
+        attachement_handler = Attachment_handler(email_client)
+        attachement_handler.parse_attachments()
     except:
         pass
-    attachement_handler = Attachment_handler()
         
 
 
